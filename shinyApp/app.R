@@ -72,6 +72,7 @@ server = function(input, output, session) {
 }
 
 
+# create data for input
 fieldsAll <- c("name", "favourite_pkg", "used_shiny", "r_num_years", "os_type")
 responsesDir <- file.path("responses")
 epochTime <- function() {
@@ -84,6 +85,31 @@ formData <- reactive({
     data <- t(data)
     data
 })
+
+# save to file
+saveData <- function(data) {
+    fileName <- sprintf("%s_%s.csv",
+                        humanTime(),
+                        digest::digest(data))
+    
+    write.csv(x = data, file = file.path(responsesDir, fileName),
+              row.names = FALSE, quote = TRUE)
+}
+
+# action to take when submit button is pressed
+observeEvent(input$submit, {
+    saveData(formData())
+})
+
+# summission message 
+div(id = "form", ...),
+shinyjs::hidden(
+    div(
+        id = "thankyou_msg",
+        h3("Thanks, your response was submitted successfully!"),
+        actionLink("submit_another", "Submit another response")
+    )
+)  
 
 # Run the application 
 shinyApp(ui = ui, server = server)
