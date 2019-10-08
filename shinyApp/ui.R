@@ -8,6 +8,8 @@ labelMandatory <- function(label) {
   )
 }
 
+Micro_fish <- read.csv("data/Micro_fish.csv", stringsAsFactors = FALSE)
+
 # CSS to use in the app
 appCSS <-
   ".mandatory_star { color: red; }
@@ -27,6 +29,14 @@ ui <- fluidPage(
   shinyjs::inlineCSS(appCSS),
   titlePanel("Field Sampling Input Form"),
   
+  sidebarPanel(
+    selectizeInput("p1", choices = Micro_fish$ComName, label = 'Common Name'),
+    selectizeInput("p2", choices = Micro_fish$Species, selected = NULL, label = 'Scientific Name')
+  ),
+  mainPanel(
+    DT::dataTableOutput('table')
+  ),
+  
   textInput('date', labelMandatory("Date"), "yyyy-mm-dd"),
   textInput('samplingTrip', labelMandatory("Sampling Trip")),
   textInput('recorder', labelMandatory("Recorder")),
@@ -34,8 +44,8 @@ ui <- fluidPage(
   
   # specify sample information
   helpText("SAMPLE DATA: ENTER AS MUCH AS POSSIBLE"),
-  textInput('commonName', "Common Name"),
-  textInput('localName', "Local  Name"),
+  textInput('commonName', labelMandatory("Common Name")),
+  textInput('sciName', labelMandatory("Scientific Name")),
   textInput('length_cm', "Length (cm)"),
   textInput('count', "Count at Given Length", value = 1),
   textInput('sex', "Sex"),

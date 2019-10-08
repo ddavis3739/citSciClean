@@ -18,8 +18,6 @@ shinyUI(fluidPage(
 
 ##server.R code
 
-Micro_fish <- read.csv("Micro_fish.csv", stringsAsFactors = FALSE)
-
 shinyServer(function(input, output, session) {
   
   updateApp <- reactive({

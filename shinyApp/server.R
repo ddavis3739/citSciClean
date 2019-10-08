@@ -2,13 +2,14 @@ library(shiny)
 
 # which fields get saved 
 fieldsAll <- c("date", "samplingTrip", "recorder", "location", 
-               'commonName', 'localName', 'length_cm', 'count', 'sex', 'notes', 'photoID', 
+               'commonName', 'sciName', 'length_cm', 'count', 'sex', 'notes', 'photoID', 
                'start_time', 'stop_time', 'ownership', 'nearestLandmark', 'gear', 
                'bait', 'samplersNumber', 'depth' 
                )
 
 # which fields are mandatory
 fieldsMandatory <- c("date", "samplingTrip", "recorder", "location")
+
 
 # functions
 outputDir <- "responses"
@@ -35,6 +36,21 @@ loadData <- function() {
 }
 
 server = function(input, output, session) {
+  
+  updateApp <- reactive({
+    # read in fish data
+    Micro_fish <- read.csv("data/Micro_fish.csv", stringsAsFactors = FALSE)
+    
+    data <- Micro_fish
+    data <- data[data$ComName %in% input$p1,]
+    updateSelectizeInput(session, 'p2', choices = data$Species, selected = data$ComName, server = TRUE)
+    
+    data
+  })
+  
+  output$table <- DT::renderDataTable(
+    DT::datatable(updateApp()) 
+  )
   
   observe({
     mandatoryFilled <-
@@ -97,7 +113,7 @@ server = function(input, output, session) {
       paste("Sampling-data-", Sys.Date(), ".csv", sep="")
     }, 
     content = function(filename){
-      write.csv(react_data(), filename)
+      write.csv(react_data(), filename, row.names=FALSE)
     }
   )
   
